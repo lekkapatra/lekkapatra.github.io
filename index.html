@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lekka</title>
+    <script src="https://unpkg.com/vue@next"></script>
+
+    <style>
+        .blbl {
+            display: block;
+            font-style: italic;
+        }
+    </style>
+
+    <!-- kool list -->
+    <script type="text/x-template" id="kooli-list">
+        <kooli-list-item v-for="labour in labours" :labour="labour"></kooli-list-item>
+    </script>
+
+    <!-- kooli list item -->
+    <script type="text/x-template" id="kooli-list-item">
+        <div>
+            <div>
+                <div>
+                    <span style="font-size: 2em">{{labour.name}}</span>
+                </div>
+                <div>
+                    <div>
+                        <span class="blbl">start: </span>
+                        <span class="blbl">{{new Date(labour.ldates[0].t).toLocaleDateString()}}</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <span class="blbl">total ₹</span>
+                    <span style="font-size: 2em">{{labour.ldates.map(t => (t.unit || 1) * labour.rate).reduce((t, l) => t + l)}}</span>
+                </div>
+                <div>
+                    <div>
+                        <span class="blbl">total</span>
+                        <span>12</span>
+                    </div>
+                    <div>
+                        <span class="blbl">missed</span>
+                        <span>5</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+</head>
+<body id="app">
+    
+    <kooli-list></kooli-list>
+
+</body>
+
+<script>
+    const app = Vue.createApp({
+        name: 'Lekka'
+    })
+
+    app.component('kooli-list', {
+        template: '#kooli-list',
+        data() {
+            return {
+                labours: [
+                    {
+                        name: "ತುಕಾರಾಮ​",
+                        ldates : [
+                            {t: 4586327, unit: 1},
+                            {t: 4586327, unit: 1},
+                            {t: 4586327, unit: 1},
+                            {t: 4586327, unit: 1},
+                            {t: 4586327, unit: 1}
+                        ],
+                        rate: 250
+                    },
+                    {
+                        name: "ಮಹಾದೇವ​",
+                        ldates : [
+                            {t: 4581327, unit: 1},
+                            {t: 4581327, unit: 1},
+                            {t: 4581327, unit: 1}
+                        ],
+                        rate: 250
+                    }
+                ]
+            }
+        }
+    })
+
+    app.component('kooli-list-item', {
+        template: '#kooli-list-item',
+        props: ['labour']
+    })
+
+    app.mount("#app")
+</script>
+
+</html>
