@@ -17,9 +17,22 @@
             margin: 0px;
         }
 
+        .accent {
+            background-color: crimson;
+            color: white;
+        }
+
         .blbl {
             display: block;
             font-style: italic;
+            font-size: 0.9em;
+            color: gray;
+        }
+
+        .lbl {
+            font-style: italic;
+            font-size: 0.9em;
+            color: gray;
         }
 
         .fill {
@@ -67,21 +80,13 @@
             margin-right: 0px;
         }
 
-        .add-btn {
+        .topbtns {
             float: right;
             display: block;
-            border-radius: 10px;
-            font-size: 1.2em;
             font-weight: bolder;
-            padding: 5px 10px;
+            padding: 5px 5px;
             cursor: pointer;
         }
-
-        .add-btn:hover {
-            color: lightgray;
-        }
-
-        .kooli-list {}
 
         .kooli-list-item {
             display: flex;
@@ -141,7 +146,7 @@
         }
 
         .kooli-details {
-            padding: 20px;
+            padding: 5px;
         }
 
         .kooli-detail {
@@ -152,8 +157,6 @@
             flex-grow: 1;
         }
 
-        .sx35 {}
-
         .m0 {
             margin: 0px;
         }
@@ -163,8 +166,11 @@
         }
 
         .kooli-calender-cell {
-            min-height: 60px;
-            padding: 5px;
+            min-height: 50px;
+        }
+
+        .tbtn {
+            margin-left: 10px;
         }
     </style>
 
@@ -184,8 +190,8 @@
                 </div>
                 <div>
                     <div v-if="labour.ldates.length > 0">
-                        <span class="blbl">start: </span>
-                        <span class="blbl">{{new Date(labour.ldates[0].t).toLocaleDateString()}}</span>
+                        <span class="blbl">{{i('start')}}</span>
+                        <span><i class="fas fa-calendar-alt" style="color: gray"></i>&nbsp;{{new Date(labour.ldates[0].t).toLocaleDateString()}}</span>
                     </div>
                 </div>
             </div>
@@ -194,7 +200,7 @@
             </div>
             <div>
                 <div>
-                    <span class="blbl">total</span>
+                    <span class="blbl">{{i('total')}}</span>
                     <div>
                         <h1 v-if="labour.ldates.length > 0" class="kooli-rate m0 ilb">{{pay()}}</h1>
                         <h1 v-else="" class="kooli-rate m0 ilb">0</h1>
@@ -203,11 +209,11 @@
                 </div>
                 <div class="hflow">
                     <div class="kooli-stat">
-                        <span class="blbl">full</span>
+                        <span class="blbl">{{i('full')}}</span>
                         <h3 class="m0 kooli-stat-num">{{full()}}</h3>
                     </div>
                     <div class="kooli-stat">
-                        <span class="blbl">half</span>
+                        <span class="blbl">{{i('half')}}</span>
                         <h3 class="m0 kooli-stat-num">{{half()}}</h3>
                     </div>
                 </div>
@@ -258,22 +264,26 @@
                 <div style="display: inline-block; flex-grow: 1; display: flex; flex-direction: column; justify-content: center">
                     <div style="text-align: center; display: flex; flex-direction: column; width: max-content">
                         <h1 class="kooli-rate sx35 m0">₹ {{pay()}}</h1>
-                        <span>(₹ {{vdata.rate}} / half day)</span>
+                        <span>
+                            <span class="lbl">(₹</span>&nbsp;
+                            <b>{{vdata.rate}}</b>&nbsp;
+                            <span class="lbl"> {{i('/ half day')}})</span>
+                        </span>
                     </div>
                 </div>
 
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow:1">
+                <div v-if="vdata.ldates.length > 0" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow:1">
                     <div>
                         <i class="fas fa-calendar-alt"></i>
                         <b>&nbsp;{{(new Date(vdata.ldates[0].t).toDateString())}}</b>
                     </div>
                     <div style="display: flex; justify-content: space-evenly">
                         <div class="kooli-stat" style="text-align: center">
-                            <span class="blbl">present </span>
+                            <span class="blbl">{{i('present')}}</span>
                             <h3 class="m0">{{present()}}</h3>
                         </div>
                         <div class="kooli-stat" style="text-align: center">
-                            <span class="blbl">absent </span>
+                            <span class="blbl">{{i('absent')}}</span>
                             <h3 class="m0">{{absent()}}</h3>
                         </div>
                     </div>
@@ -282,21 +292,21 @@
                 <div style="display: inline-block; display: flex; flex-direction: column">
                     <div style="text-align: center">
                         <h1 class="kooli-rate m0 ilb">{{present()}}</h1>
-                        <i class="blb">day(s)</i>
+                        <i class="blb">{{i('days')}}</i>
                     </div>
                     <div style="display: flex; justify-content: space-evenly">
                         <div class="kooli-stat" style="margin-right: 20px; text-align: center">
-                            <span class="blbl">half </span>
+                            <span class="blbl">{{i('half')}}</span>
                             <h3 class="m0">{{half()}}</h3>
                         </div>
                         <div class="kooli-stat" style="text-align: center">
-                            <span class="blbl">full </span>
+                            <span class="blbl">{{i('full')}}</span>
                             <h3 class="m0">{{full()}}</h3>
                         </div>
                     </div>
                 </div>
             </div>
-            <div style="margin: 60px 20px">
+            <div style="margin: 60px 10px">
                 <kooli-calender :dateset="[vdata.ldates]"></kooli-calender>
             </div>
         </div>
@@ -305,24 +315,32 @@
     <script type="text/x-template" id="kooli-calender">
         <div>
             <div style="display: flex; ">
-                <i @click="monthprev" class="fas fa-chevron-left"></i>
+                <i @click="monthprev" style="color: grey" class="fas fa-chevron-left"></i>
                 <h4 class="m0 ilb fg" style="text-align: center">{{month}} {{year}} </h4>
-                <i @click="monthnext" class="fas fa-chevron-right"></i>
+                <i @click="monthnext" style="color: grey" class="fas fa-chevron-right"></i>
             </div>
-            <table style="table-layout: fixed; width: 100%; border-collapse: collapse; margin: 10px">
-                <tr>
-                    <th align="left" v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']">{{day}}</th>
-                </tr>
-                <tr v-for="week in weeks">
-                    <td v-for="day in week" style="border-collapse: collapse">
+            <table style="table-layout: fixed; width: 100%; border-collapse: collapse; margin: 10px 0px">
+                <tr v-for="(wday, idx) in wdays">
+                    <th style="text-align: center; opacity: 0.6" class="accent">
+                        <span style="font-size: 0.8em">{{wdaynames()[idx]}}</span>
+                    </th>
+                    <td v-for="day in wday" style="border-collapse: collapse; padding: 0px">
                         <div class="kooli-calender-cell" @click="toggleThisDay(day)" style="display: flex; justify-content: center; align-items: center; position:relative;"
-                             :style="{'background-color': day.today ? 'skyblue' : (day.thisMonth ? 'aliceblue' : '#fafafa')}">
+                             :style="{'border': (day.today ? 'solid 1px skyblue' : 'solid 1px #eaeaea'), 'background-color': (day.today ? 'aliceblue': (day.thisMonth ? 'transparent' : '#f5f5f5'))}">
                              <span style="position: absolute; top: 5px; left: 5px">{{day.date.getDate()}}</span>
                              <kooli-unit :height="'30px'" :width="'30px'" :unit="day.unit"></kooli-unit>
                         </div>
                     </td>
                 </tr>
             </table>
+        </div>
+    </script>
+
+    <script type="text/x-template" id="settings-page">
+        <div style="padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: auto">
+            <select @change="langchange" :value="lang">
+                <option v-for="lang in langs">{{lang}}</option>
+            </select>
         </div>
     </script>
 </head>
@@ -332,8 +350,15 @@
         <div class="title-bar">
             <i v-if="currentComponent != 'kooli-list'" @click="route('kooli-list')" class="fa fa-arrow-left back-btn"
                 aria-hidden="true"></i>
-            <span class="title">ಲೆಕ್ಕ-ಪತ್ರ</span>
-            <span class="add-btn" @click="route('edit-kooli')">+ New</span>
+            <span class="title">{{i('title')}}</span>
+            <div class="topbtns">
+                <span v-if="currentComponent == 'kooli-list'" class="tbtn" @click="route('edit-kooli')">
+                    <i class="fas fa-user-plus"></i>
+                </span>
+                <span @click="route('settings-page')" class="tbtn">
+                    <i class="fas fa-cog"></i>
+                </span>
+            </div>
         </div>
         <component :is="currentComponent" :route="route" :vdata="vdata"></component>
     </div>
@@ -343,7 +368,7 @@
     let data = JSON.parse(localStorage.getItem('data')) || {
         labours: [
             {
-                name: "ತುಕಾರಾಮ​",
+                name: "x",
                 ldates: [
                     { t: 1622917800000, unit: 1 },
                     { t: 1623004200000, unit: 1 },
@@ -353,7 +378,7 @@
                 rate: 250
             },
             {
-                name: "ಮಹಾದೇವ​",
+                name: "y",
                 ldates: [
                     { t: 1622917800000, unit: 1 },
                     { t: 1623090600000, unit: 2 },
@@ -362,6 +387,42 @@
                 rate: 250
             }
         ]
+    }
+
+    let settings = JSON.parse(localStorage.getItem('settings')) || {
+        lang: 'kannada',
+        accentColor: 'crimson'
+    }
+
+    let lbls = {
+        'ಕನ್ನಡ​': {
+            'title': 'ಲೆಕ್ಕ-ಪತ್ರ',
+            'total': 'ಒಟ್ಟು',
+            'absent': 'ಖಾಡಿ',
+            'present': 'ಬಂದಿದ್ದು',
+            'start': 'ಶುರು',
+            'full': 'ಪೂರ್ತಿ',
+            'half': 'ಅರ್ಧ',
+            'months': ['ಜನೆವರಿ', 'ಫೆಬ್ರುವರಿ', 'ಮಾರ್ಚ್', 'ಎಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಅಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೊಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'],
+            'wdays': ['ರವಿ', 'ಸೋಮ', 'ಮಂಗಳ​', 'ಬುಧ​', 'ಗುರು', 'ಶುಕ್ರ​', 'ಶನಿ'],
+            'days': 'ದಿನ​',
+            '/ half day': 'ಅರ್ಧ ದಿನಕ್ಕೆ'
+        },
+        'english': {
+            'title': 'pay-chart',
+            'total': 'Total',
+            'absent': 'Absent',
+            'present': 'Present',
+            'start': 'Start date',
+            'full': 'Full',
+            'half': 'Half',
+            'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            'wdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        }
+    }
+
+    function i(x) {
+        return settings.lang in lbls ? lbls[settings.lang][x] : x;
     }
 
     const app = Vue.createApp({
@@ -373,6 +434,9 @@
             route(to, data) {
                 this.currentComponent = to;
                 this.vdata = data;
+            },
+            i(x) {
+                return i(x)
             }
         }
     })
@@ -420,14 +484,13 @@
                 } else {
                     let dd = d[d.length - 1];
                     let unit = (dd.unit + 1) % 3
-                    if (unit == 0)
-                        d.pop()
-                    else
-                        dd.unit = unit
+                    if (unit == 0) d.pop()
+                    else dd.unit = unit
                 }
                 _save();
                 e.stopPropagation();
-            }
+            },
+            i: i
         }
     })
 
@@ -469,6 +532,9 @@
             },
             full() {
                 return _full(this.vdata);
+            },
+            i(x) {
+                return i(x)
             }
         }
     })
@@ -502,36 +568,36 @@
                     delete day['unit']
                     day.dset.splice(day.dset.findIndex(x => x.t == day.date.getTime()), 1)
                 } else {
-                    let filt = day.dset.filter(x => {
-                        console.log(">>>>>", x, day.date.getTime(), day)
-                        return x.t == day.date.getTime()
-                    })
+                    let filt = day.dset.filter(x => x.t == day.date.getTime())
                     if (filt.length == 0) day.dset.push(new_ldate(day.date, day.unit))
                     else filt[0].unit = day.unit
                     day.dset.sort((a, b) => a.t - b.t)
                 }
                 _save()
+            },
+            wdaynames() {
+                return i('wdays')//[+x]
             }
         },
         computed: {
             month() {
                 let d = new Date(new Date(this.today).setMonth(this.monthoff + this.today.getMonth())).getMonth();
-                return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d];
+                return i('months')[d];
             },
             year() {
                 return new Date(new Date(this.today).setMonth(this.monthoff + this.today.getMonth())).getFullYear();
             },
-            weeks() {
+            wdays() {
                 let today = new Date(this.today)
                 today.setMonth(this.monthoff + today.getMonth())
                 let cutc = +today
                 let offset = new Date(today.setDate(1)).getDay() - 1;
 
-                let ret = []//, num = this.dateset
-                for (let i = 0; i < 5; i++) {
-                    ret.push([])
-                    for (let j = 0; j < 7; j++) {
-                        let d = new Date(new Date((new Date(cutc)).setDate(i * 7 + j - offset)).setHours(0, 0, 0, 0))
+                let ret = [1, 2, 3, 4, 5, 6, 7].map(x => [])
+                let _i = i;
+                for (let i = 0; i < 7; i++) {
+                    for (let j = 0; j < 5; j++) {
+                        let d = new Date(new Date((new Date(cutc)).setDate(j * 7 + i - offset)).setHours(0, 0, 0, 0))
                         ret[i][j] = {
                             date: d,
                             today: ((new Date(this.today)).getDate() == d.getDate() && (new Date(this.today)).getMonth() == d.getMonth()),
@@ -539,13 +605,14 @@
                         }
                     }
                 }
-                for (let k = 0; k < this.dateset.length; k++) {
-                    let ds = this.dateset[k]
-                    for (let di = 0; di < ds.length; di++) {
-                        const d = new Date(ds[di].t).setHours(0, 0, 0, 0);
-                        for (let i = 0; i < ret.length; i++) {
-                            for (let j = 0; j < ret[i].length; j++) {
-                                ret[i][j].dset = ds
+
+                for (let i = 0; i < ret.length; i++) {
+                    for (let j = 0; j < ret[i].length; j++) {
+                        for (let k = 0; k < this.dateset.length; k++) {
+                            let ds = this.dateset[k]
+                            ret[i][j].dset = ds
+                            for (let di = 0; di < ds.length; di++) {
+                                const d = new Date(ds[di].t).setHours(0, 0, 0, 0);
                                 if (d == ret[i][j].date.getTime()) {
                                     ret[i][j].unit = ds[di].unit
                                 }
@@ -558,8 +625,34 @@
         }
     })
 
+    app.component('settings-page', {
+        name: 'settings-page',
+        template: '#settings-page',
+        computed: {
+            langs() {
+                return Object.keys(lbls)
+            },
+            lang() {
+                return settings.lang;
+            }
+        },
+        methods: {
+            save() {
+                _save()
+            },
+            langchange(e) {
+                settings.lang = e.target.value;
+                _savesettings()
+            }
+        }
+    })
+
     function _save() {
         localStorage.setItem('data', JSON.stringify(data))
+    }
+
+    function _savesettings() {
+        localStorage.setItem('settings', JSON.stringify(settings))
     }
 
     function _present(vdata) {
@@ -584,7 +677,7 @@
     }
 
     function today() {
-        return Math.ceil((+new Date(0)) / (1000 * 60 * 60 * 24))
+        return +new Date(new Date().setHours(0, 0, 0, 0))
     }
 
     function _full(vdata) {
