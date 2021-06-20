@@ -1,103 +1,603 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lekka</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://unpkg.com/vue@next"></script>
 
     <style>
+        body {
+            margin: 0px;
+        }
+
         .blbl {
             display: block;
             font-style: italic;
         }
+
+        .fill {
+            flex-grow: 1;
+        }
+
+        .hflow {
+            display: flex;
+        }
+
+        .right {
+            justify-content: right;
+        }
+
+        .vflow {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top {
+            vertical-align: top;
+        }
+
+        #app {
+            margin: auto;
+            max-width: 500px;
+        }
+
+        .title-bar {
+            display: block;
+            background-color: crimson;
+            color: white;
+            padding: 5px 5px;
+        }
+
+        .title {
+            font-size: 1.5em;
+            font-weight: bolder;
+        }
+
+        .back-btn {
+            height: 100%;
+            padding: 0px 10px;
+            font-size: 29px;
+            margin-right: 0px;
+        }
+
+        .add-btn {
+            float: right;
+            display: block;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bolder;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            color: lightgray;
+        }
+
+        .kooli-list {}
+
+        .kooli-list-item {
+            display: flex;
+            border-bottom: solid 1px lightgrey;
+            padding: 20px;
+        }
+
+        .kooli-stat {
+            margin: 0px 5px 0px 0px;
+        }
+
+        .kooli-stat-num {
+            font-weight: bolder;
+            margin-left: 5px;
+        }
+
+        .edit-kooli {
+            margin: 20px;
+        }
+
+        .edit-kooli-name {
+            font-size: 2em;
+            border: none;
+            outline: none;
+            margin-left: 5px;
+            border-bottom: solid 1px crimson;
+            width: 100%;
+            width: -moz-available;
+            /* For Mozzila */
+            width: -webkit-fill-available;
+            /* For Chrome */
+            width: stretch;
+            /* Unprefixed */
+        }
+
+        .edit-field {
+            margin: 30px 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 20px;
+            border-radius: 5px;
+            margin: 20px 0px;
+            outline: none;
+            border: none;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            opacity: 0.5;
+        }
+
+        .green {
+            background-color: darkgreen;
+            color: white;
+        }
+
+        .kooli-details {
+            padding: 20px;
+        }
+
+        .kooli-detail {
+            margin: 10px;
+        }
+
+        .fg {
+            flex-grow: 1;
+        }
+
+        .sx35 {}
+
+        .m0 {
+            margin: 0px;
+        }
+
+        .ilb {
+            display: inline-block;
+        }
+
+        .kooli-calender-cell {
+            min-height: 60px;
+            padding: 5px;
+        }
     </style>
 
-    <!-- kool list -->
+    <!-- kooli list -->
     <script type="text/x-template" id="kooli-list">
-        <kooli-list-item v-for="labour in labours" :labour="labour"></kooli-list-item>
+        <div class="kooli-list">
+            <kooli-list-item v-for="labour in labours" :labour="labour" :route="route"></kooli-list-item>
+        </div>
     </script>
 
     <!-- kooli list item -->
     <script type="text/x-template" id="kooli-list-item">
-        <div>
-            <div>
-                <div>
-                    <span style="font-size: 2em">{{labour.name}}</span>
+        <div class="kooli-list-item hflow" @click="route('kooli-detail', labour)">
+            <div class="vflow fill">
+                <div class="fill">
+                    <h2 class="kooli-name m0">{{labour.name}}</h2>
                 </div>
                 <div>
-                    <div>
+                    <div v-if="labour.ldates.length > 0">
                         <span class="blbl">start: </span>
                         <span class="blbl">{{new Date(labour.ldates[0].t).toLocaleDateString()}}</span>
                     </div>
                 </div>
             </div>
+            <div style="display: flex; justify-content: center; align-content: center; flex-direction: column; padding-right: 20px">
+                <kooli-unit @click="toggleToday" :height="'50px'" :width="'50px'" :unit="unittoday()"></kooli-unit>
+            </div>
             <div>
                 <div>
-                    <span class="blbl">total ₹</span>
-                    <span style="font-size: 2em">{{labour.ldates.map(t => (t.unit || 1) * labour.rate).reduce((t, l) => t + l)}}</span>
-                </div>
-                <div>
+                    <span class="blbl">total</span>
                     <div>
-                        <span class="blbl">total</span>
-                        <span>12</span>
+                        <h1 v-if="labour.ldates.length > 0" class="kooli-rate m0 ilb">{{pay()}}</h1>
+                        <h1 v-else="" class="kooli-rate m0 ilb">0</h1>
+                        <span class="top" style="margin-top: 3px">₹</span>
                     </div>
-                    <div>
-                        <span class="blbl">missed</span>
-                        <span>5</span>
+                </div>
+                <div class="hflow">
+                    <div class="kooli-stat">
+                        <span class="blbl">full</span>
+                        <h3 class="m0 kooli-stat-num">{{full()}}</h3>
+                    </div>
+                    <div class="kooli-stat">
+                        <span class="blbl">half</span>
+                        <h3 class="m0 kooli-stat-num">{{half()}}</h3>
                     </div>
                 </div>
             </div>
         </div>
     </script>
 
-</head>
-<body id="app">
-    
-    <kooli-list></kooli-list>
+    <!-- edit kooli -->
+    <script type="text/x-template" id="edit-kooli">
+        <div class="edit-kooli">
+            <div class="edit-field">
+                <span class="blbl">name</span>
+                <input ref="name" class="edit-kooli-name" />
+            </div>
+            <div class="edit-field">
+                <span class="blbl">rate</span>
+                <input ref="salary" class="edit-kooli-name" type="number" />
+            </div>
+            <div class="edit-field" style="margin: auto; width: max-content">
+                <button class="btn red" @click="route('kooli-list')">Cancel</button>
+                <button class="btn green" @click="save">Save</button>
+            </div>
+        </div>
+    </script>
 
+    <script type="text/x-template" id="kooli-unit">
+        <div>
+            <svg v-if="unit==0" :width="width" :height="height" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="#ddd"/>
+            </svg>
+            <svg v-if="unit==1" :width="width" :height="height" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="transparent"/>
+                <path d="M50,5 A45,45 0 0,0 50,95" fill="orange" />
+            </svg>
+            <svg v-if="unit==2" :width="width" :height="height" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="orange"/>
+            </svg>
+        </div>
+    </script>
+
+    <script type="text/x-template" id="kooli-detail">
+        <div class="kooli-details">
+            <div class="kooli-detail">
+                <h1 class="kooli-name m0">{{vdata.name}}</h1>
+            </div>
+            <div class="kooli-detail" style="display: flex; margin: 30px 15px">
+
+                <div style="display: inline-block; flex-grow: 1; display: flex; flex-direction: column; justify-content: center">
+                    <div style="text-align: center; display: flex; flex-direction: column; width: max-content">
+                        <h1 class="kooli-rate sx35 m0">₹ {{pay()}}</h1>
+                        <span>(₹ {{vdata.rate}} / half day)</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow:1">
+                    <div>
+                        <i class="fas fa-calendar-alt"></i>
+                        <b>&nbsp;{{(new Date(vdata.ldates[0].t).toDateString())}}</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-evenly">
+                        <div class="kooli-stat" style="text-align: center">
+                            <span class="blbl">present </span>
+                            <h3 class="m0">{{present()}}</h3>
+                        </div>
+                        <div class="kooli-stat" style="text-align: center">
+                            <span class="blbl">absent </span>
+                            <h3 class="m0">{{absent()}}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: inline-block; display: flex; flex-direction: column">
+                    <div style="text-align: center">
+                        <h1 class="kooli-rate m0 ilb">{{present()}}</h1>
+                        <i class="blb">day(s)</i>
+                    </div>
+                    <div style="display: flex; justify-content: space-evenly">
+                        <div class="kooli-stat" style="margin-right: 20px; text-align: center">
+                            <span class="blbl">half </span>
+                            <h3 class="m0">{{half()}}</h3>
+                        </div>
+                        <div class="kooli-stat" style="text-align: center">
+                            <span class="blbl">full </span>
+                            <h3 class="m0">{{full()}}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin: 60px 20px">
+                <kooli-calender :dateset="[vdata.ldates]"></kooli-calender>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/x-template" id="kooli-calender">
+        <div>
+            <div style="display: flex; ">
+                <i @click="monthprev" class="fas fa-chevron-left"></i>
+                <h4 class="m0 ilb fg" style="text-align: center">{{month}} {{year}} </h4>
+                <i @click="monthnext" class="fas fa-chevron-right"></i>
+            </div>
+            <table style="table-layout: fixed; width: 100%; border-collapse: collapse; margin: 10px">
+                <tr>
+                    <th align="left" v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']">{{day}}</th>
+                </tr>
+                <tr v-for="week in weeks">
+                    <td v-for="day in week" style="border-collapse: collapse">
+                        <div class="kooli-calender-cell" @click="toggleThisDay(day)" style="display: flex; justify-content: center; align-items: center; position:relative;"
+                             :style="{'background-color': day.today ? 'skyblue' : (day.thisMonth ? 'aliceblue' : '#fafafa')}">
+                             <span style="position: absolute; top: 5px; left: 5px">{{day.date.getDate()}}</span>
+                             <kooli-unit :height="'30px'" :width="'30px'" :unit="day.unit"></kooli-unit>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="title-bar">
+            <i v-if="currentComponent != 'kooli-list'" @click="route('kooli-list')" class="fa fa-arrow-left back-btn"
+                aria-hidden="true"></i>
+            <span class="title">ಲೆಕ್ಕ-ಪತ್ರ</span>
+            <span class="add-btn" @click="route('edit-kooli')">+ New</span>
+        </div>
+        <component :is="currentComponent" :route="route" :vdata="vdata"></component>
+    </div>
 </body>
 
 <script>
-    const app = Vue.createApp({
-        name: 'Lekka'
-    })
+    let data = JSON.parse(localStorage.getItem('data')) || {
+        labours: [
+            {
+                name: "ತುಕಾರಾಮ​",
+                ldates: [
+                    { t: 1622917800000, unit: 1 },
+                    { t: 1623004200000, unit: 1 },
+                    { t: 1623090600000, unit: 2 },
+                    { t: 1623263400000, unit: 1 }
+                ],
+                rate: 250
+            },
+            {
+                name: "ಮಹಾದೇವ​",
+                ldates: [
+                    { t: 1622917800000, unit: 1 },
+                    { t: 1623090600000, unit: 2 },
+                    { t: 1623263400000, unit: 1 }
+                ],
+                rate: 250
+            }
+        ]
+    }
 
-    app.component('kooli-list', {
-        template: '#kooli-list',
+    const app = Vue.createApp({
+        name: 'Lekka',
         data() {
-            return {
-                labours: [
-                    {
-                        name: "ತುಕಾರಾಮ​",
-                        ldates : [
-                            {t: 4586327, unit: 1},
-                            {t: 4586327, unit: 1},
-                            {t: 4586327, unit: 1},
-                            {t: 4586327, unit: 1},
-                            {t: 4586327, unit: 1}
-                        ],
-                        rate: 250
-                    },
-                    {
-                        name: "ಮಹಾದೇವ​",
-                        ldates : [
-                            {t: 4581327, unit: 1},
-                            {t: 4581327, unit: 1},
-                            {t: 4581327, unit: 1}
-                        ],
-                        rate: 250
-                    }
-                ]
+            return { currentComponent: 'kooli-list', vdata: data }
+        },
+        methods: {
+            route(to, data) {
+                this.currentComponent = to;
+                this.vdata = data;
             }
         }
     })
 
-    app.component('kooli-list-item', {
-        template: '#kooli-list-item',
-        props: ['labour']
+    app.component('kooli-list', {
+        name: 'kooli-list',
+        template: '#kooli-list',
+        props: ['route'],
+        data() {
+            return data;
+        }
     })
+
+    app.component('kooli-list-item', {
+        name: 'kooli-list-item',
+        template: '#kooli-list-item',
+        props: ['labour', 'route'],
+        methods: {
+            pay() {
+                return _pay(this.labour)
+            },
+            present() {
+                return _present(this.labour)
+            },
+            absent() {
+                return _absent(this.labour)
+            },
+            total() {
+                return _total(this.labour)
+            },
+            full() {
+                return _full(this.labour)
+            },
+            half() {
+                return _half(this.labour)
+            },
+            unittoday() {
+                let d = this.labour.ldates;
+                return (d.length > 0 && d[d.length - 1].t == today()) ? d[d.length - 1].unit : 0;
+            },
+            toggleToday(e) {
+                let d = this.labour.ldates;
+                if (d.length == 0 || d[d.length - 1].t != today()) {
+                    d.push(new_ldate(today(), 1))
+                } else {
+                    let dd = d[d.length - 1];
+                    let unit = (dd.unit + 1) % 3
+                    if (unit == 0)
+                        d.pop()
+                    else
+                        dd.unit = unit
+                }
+                _save();
+                e.stopPropagation();
+            }
+        }
+    })
+
+    app.component('edit-kooli', {
+        name: 'edit-kooli',
+        template: '#edit-kooli',
+        props: ['labour', 'route'],
+        methods: {
+            save() {
+                data.labours.push({
+                    name: this.$refs.name.value,
+                    rate: this.$refs.salary.value,
+                    ldates: []
+                })
+                _save()
+                this.route('kooli-list')
+            }
+        }
+    })
+
+    app.component('kooli-detail', {
+        template: '#kooli-detail',
+        props: ['vdata'],
+        methods: {
+            present() {
+                return _present(this.vdata)
+            },
+            absent() {
+                return _absent(this.vdata)
+            },
+            pay() {
+                return _pay(this.vdata)
+            },
+            total() {
+                return _total(this.vdata)
+            },
+            half() {
+                return _half(this.vdata);
+            },
+            full() {
+                return _full(this.vdata);
+            }
+        }
+    })
+
+    app.component('kooli-unit', {
+        name: 'kooli-unit',
+        template: '#kooli-unit',
+        props: ['unit', 'height', 'width']
+    })
+
+    app.component('kooli-calender', {
+        name: 'kooli-calender',
+        template: '#kooli-calender',
+        props: ['dateset'],
+        data() {
+            return { today: new Date(), monthoff: 0 }
+        },
+        methods: {
+            monthprev() {
+                this.monthoff--;
+            },
+            monthnext() {
+                this.monthoff++;
+            },
+            toggleThisDay(day) {
+                if (+day.date > +new Date()) {
+                    return;
+                }
+                day.unit = ((day.unit || 0) + 1) % 3
+                if (day.unit == 0) {
+                    delete day['unit']
+                    day.dset.splice(day.dset.findIndex(x => x.t == day.date.getTime()), 1)
+                } else {
+                    let filt = day.dset.filter(x => {
+                        console.log(">>>>>", x, day.date.getTime(), day)
+                        return x.t == day.date.getTime()
+                    })
+                    if (filt.length == 0) day.dset.push(new_ldate(day.date, day.unit))
+                    else filt[0].unit = day.unit
+                    day.dset.sort((a, b) => a.t - b.t)
+                }
+                _save()
+            }
+        },
+        computed: {
+            month() {
+                let d = new Date(new Date(this.today).setMonth(this.monthoff + this.today.getMonth())).getMonth();
+                return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d];
+            },
+            year() {
+                return new Date(new Date(this.today).setMonth(this.monthoff + this.today.getMonth())).getFullYear();
+            },
+            weeks() {
+                let today = new Date(this.today)
+                today.setMonth(this.monthoff + today.getMonth())
+                let cutc = +today
+                let offset = new Date(today.setDate(1)).getDay() - 1;
+
+                let ret = []//, num = this.dateset
+                for (let i = 0; i < 5; i++) {
+                    ret.push([])
+                    for (let j = 0; j < 7; j++) {
+                        let d = new Date(new Date((new Date(cutc)).setDate(i * 7 + j - offset)).setHours(0, 0, 0, 0))
+                        ret[i][j] = {
+                            date: d,
+                            today: ((new Date(this.today)).getDate() == d.getDate() && (new Date(this.today)).getMonth() == d.getMonth()),
+                            thisMonth: (d.getMonth() == (new Date(this.today)).getMonth(0))
+                        }
+                    }
+                }
+                for (let k = 0; k < this.dateset.length; k++) {
+                    let ds = this.dateset[k]
+                    for (let di = 0; di < ds.length; di++) {
+                        const d = new Date(ds[di].t).setHours(0, 0, 0, 0);
+                        for (let i = 0; i < ret.length; i++) {
+                            for (let j = 0; j < ret[i].length; j++) {
+                                ret[i][j].dset = ds
+                                if (d == ret[i][j].date.getTime()) {
+                                    ret[i][j].unit = ds[di].unit
+                                }
+                            }
+                        }
+                    }
+                }
+                return ret;
+            }
+        }
+    })
+
+    function _save() {
+        localStorage.setItem('data', JSON.stringify(data))
+    }
+
+    function _present(vdata) {
+        return vdata.ldates.length;
+    }
+
+    function _absent(vdata) {
+        return _total(vdata) - vdata.ldates.length;
+    }
+
+    function _pay(labour) {
+        return labour.ldates.map(t => (t.unit || 1) * labour.rate).reduce((t, l) => t + l, 0);
+    }
+
+    function _total(vdata) {
+        if (vdata.ldates.length < 1)
+            return 0;
+        const date1 = new Date(vdata.ldates[0].t);
+        const date2 = new Date();
+        const diffTime = Math.abs(date2 - date1);
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    function today() {
+        return Math.ceil((+new Date(0)) / (1000 * 60 * 60 * 24))
+    }
+
+    function _full(vdata) {
+        return vdata.ldates.map(t => t.unit).filter(x => x == 2).reduce((t, c) => t + 1, 0)
+    }
+
+    function _half(vdata) {
+        return vdata.ldates.map(t => t.unit).filter(x => x == 1).reduce((t, c) => t + 1, 0)
+    }
+
+    function new_ldate(d, unit) {
+        return { t: +d, unit }
+    }
 
     app.mount("#app")
 </script>
