@@ -69,15 +69,12 @@
         }
 
         .title {
-            font-size: 1.5em;
+            font-size: 1.2em;
             font-weight: bolder;
         }
 
         .back-btn {
-            height: 100%;
-            padding: 0px 10px;
-            font-size: 29px;
-            margin-right: 0px;
+            margin-right: 10px;
         }
 
         .topbtns {
@@ -92,6 +89,10 @@
             display: flex;
             border-bottom: solid 1px lightgrey;
             padding: 20px;
+            width: 100%;
+            width: -moz-available;          /* For Mozzila */
+            width: -webkit-fill-available;  /* For Chrome */
+            width: stretch;                 /* Unprefixed */
         }
 
         .kooli-stat {
@@ -195,26 +196,28 @@
                     </div>
                 </div>
             </div>
-            <div style="display: flex; justify-content: center; align-content: center; flex-direction: column; padding-right: 20px">
+            <div style="display: flex; justify-content: center; align-content: center; flex-direction: column; padding-right: 20px; flex-grow: 1; text-align: right">
                 <kooli-unit @click="toggleToday" :height="'50px'" :width="'50px'" :unit="unittoday()"></kooli-unit>
             </div>
-            <div>
+            <div style="flex-grow: 1; text-align: right">
                 <div>
-                    <span class="blbl">{{i('total')}}</span>
                     <div>
-                        <h1 v-if="labour.ldates.length > 0" class="kooli-rate m0 ilb">{{pay()}}</h1>
-                        <h1 v-else="" class="kooli-rate m0 ilb">0</h1>
-                        <span class="top" style="margin-top: 3px">₹</span>
+                        <span class="blbl">{{i('total')}}</span>
+                        <div>
+                            <h1 v-if="labour.ldates.length > 0" class="kooli-rate m0 ilb">{{pay()}}</h1>
+                            <h1 v-else="" class="kooli-rate m0 ilb">0</h1>
+                            <span class="top" style="margin-top: 3px">₹</span>
+                        </div>
                     </div>
-                </div>
-                <div class="hflow">
-                    <div class="kooli-stat">
-                        <span class="blbl">{{i('full')}}</span>
-                        <h3 class="m0 kooli-stat-num">{{full()}}</h3>
-                    </div>
-                    <div class="kooli-stat">
-                        <span class="blbl">{{i('half')}}</span>
-                        <h3 class="m0 kooli-stat-num">{{half()}}</h3>
+                    <div class="hflow" style="justify-content: flex-end;">
+                        <div class="kooli-stat">
+                            <span class="blbl">{{i('full')}}</span>
+                            <h3 class="m0 kooli-stat-num">{{full()}}</h3>
+                        </div>
+                        <div class="kooli-stat">
+                            <span class="blbl">{{i('half')}}</span>
+                            <h3 class="m0 kooli-stat-num">{{half()}}</h3>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -225,23 +228,27 @@
     <script type="text/x-template" id="edit-kooli">
         <div class="edit-kooli">
             <div class="edit-field">
-                <span class="blbl">name</span>
+                <span class="blbl">{{i('name')}}</span>
                 <input ref="name" class="edit-kooli-name" />
             </div>
             <div class="edit-field">
-                <span class="blbl">rate</span>
+                <span class="blbl">{{i('rate')}}</span>
                 <input ref="salary" class="edit-kooli-name" type="number" />
             </div>
             <div class="edit-field" style="margin: auto; width: max-content">
-                <button class="btn red" @click="route('kooli-list')">Cancel</button>
-                <button class="btn green" @click="save">Save</button>
+                <button class="btn red" @click="route('kooli-list')">{{i('cancel')}}</button>
+                <button class="btn accent" @click="save">{{i('save')}}</button>
             </div>
         </div>
     </script>
 
     <script type="text/x-template" id="kooli-unit">
         <div>
-            <svg v-if="unit==0" :width="width" :height="height" viewBox="0 0 100 100">
+            <i v-if="unit==0" style="font-size: 36px; color: #eee" class="fas fa-check"></i>
+            <i v-if="unit==1" style="font-size: 36px; color: darkgreen" class="fas fa-check"></i>
+            <i v-if="unit==2" style="font-size: 36px; color: darkgreen" class="fas fa-check-double"></i>
+        
+            <!-- <svg v-if="unit==0" :width="width" :height="height" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="45" fill="#ddd"/>
             </svg>
             <svg v-if="unit==1" :width="width" :height="height" viewBox="0 0 100 100">
@@ -250,14 +257,15 @@
             </svg>
             <svg v-if="unit==2" :width="width" :height="height" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="45" fill="orange"/>
-            </svg>
+            </svg> -->
         </div>
     </script>
 
     <script type="text/x-template" id="kooli-detail">
         <div class="kooli-details">
-            <div class="kooli-detail">
-                <h1 class="kooli-name m0">{{vdata.name}}</h1>
+            <div class="kooli-detail" style="display: flex; align-items:center">
+                <h1 class="kooli-name m0" style="display: inline; flex-grow: 1">{{vdata.name}}</h1>
+                <i @click="deleteLabourer" class="fas fa-trash"></i>
             </div>
             <div class="kooli-detail" style="display: flex; margin: 30px 15px">
 
@@ -273,7 +281,8 @@
                 </div>
 
                 <div v-if="vdata.ldates.length > 0" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow:1">
-                    <div>
+                    <div style="text-align: center">
+                        <i class="blbl">{{i('start')}}</i>
                         <i class="fas fa-calendar-alt"></i>
                         <b>&nbsp;{{(new Date(vdata.ldates[0].t).toDateString())}}</b>
                     </div>
@@ -338,6 +347,8 @@
 
     <script type="text/x-template" id="settings-page">
         <div style="padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: auto">
+            <div>{{msg}}</div>
+            <label>{{i('language')}}</label>
             <select @change="langchange" :value="lang">
                 <option v-for="lang in langs">{{lang}}</option>
             </select>
@@ -348,14 +359,13 @@
 <body>
     <div id="app">
         <div class="title-bar">
-            <i v-if="currentComponent != 'kooli-list'" @click="route('kooli-list')" class="fa fa-arrow-left back-btn"
-                aria-hidden="true"></i>
+            <i v-if="currentComponent != 'kooli-list'" @click="route('kooli-list')" class="fa fa-arrow-left back-btn" aria-hidden="true"></i>
             <span class="title">{{i('title')}}</span>
             <div class="topbtns">
                 <span v-if="currentComponent == 'kooli-list'" class="tbtn" @click="route('edit-kooli')">
                     <i class="fas fa-user-plus"></i>
                 </span>
-                <span @click="route('settings-page')" class="tbtn">
+                <span v-if="currentComponent == 'kooli-list'" @click="route('settings-page')" class="tbtn">
                     <i class="fas fa-cog"></i>
                 </span>
             </div>
@@ -400,15 +410,21 @@
             'total': 'ಒಟ್ಟು',
             'absent': 'ಖಾಡಿ',
             'present': 'ಬಂದಿದ್ದು',
-            'start': 'ಶುರು',
+            'start': 'ಶುರು ತಾರಿಖು',
             'full': 'ಪೂರ್ತಿ',
             'half': 'ಅರ್ಧ',
             'months': ['ಜನೆವರಿ', 'ಫೆಬ್ರುವರಿ', 'ಮಾರ್ಚ್', 'ಎಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಅಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೊಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'],
             'wdays': ['ರವಿ', 'ಸೋಮ', 'ಮಂಗಳ​', 'ಬುಧ​', 'ಗುರು', 'ಶುಕ್ರ​', 'ಶನಿ'],
             'days': 'ದಿನ​',
-            '/ half day': 'ಅರ್ಧ ದಿನಕ್ಕೆ'
+            '/ half day': 'ಅರ್ಧ ದಿನಕ್ಕೆ',
+            'name': 'ಹೆಸರು',
+            'rate': 'ಅರ್ಧ ದಿನದ ಕೂಲಿ',
+            'save': 'ಉಳಿಸಿ',
+            'cancel': 'ರದ್ದುಮಾಡಿ',
+            'language': 'ಭಾಷೆ',
+            'Language has been changed': 'ಭಾಷೆ ಬದಲಿಸಲಾಗಿದೆ'
         },
-        'english': {
+        'English': {
             'title': 'pay-chart',
             'total': 'Total',
             'absent': 'Absent',
@@ -417,12 +433,17 @@
             'full': 'Full',
             'half': 'Half',
             'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-            'wdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+            'wdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            'save': 'Save',
+            'cancel': 'Cancel',
+            'rate': 'Labour for half day work',
+            'name': 'Name',
+            'language': 'Language'
         }
     }
 
     function i(x) {
-        return settings.lang in lbls ? lbls[settings.lang][x] : x;
+        return settings.lang in lbls ? lbls[settings.lang][x] : lbls['English'][x];
     }
 
     const app = Vue.createApp({
@@ -507,13 +528,16 @@
                 })
                 _save()
                 this.route('kooli-list')
+            },
+            i(x) {
+                return i(x)
             }
         }
     })
 
     app.component('kooli-detail', {
         template: '#kooli-detail',
-        props: ['vdata'],
+        props: ['vdata', 'route'],
         methods: {
             present() {
                 return _present(this.vdata)
@@ -535,6 +559,10 @@
             },
             i(x) {
                 return i(x)
+            },
+            deleteLabourer() {
+                this.route('kooli-list')
+                _delete(this.vdata)
             }
         }
     })
@@ -628,6 +656,9 @@
     app.component('settings-page', {
         name: 'settings-page',
         template: '#settings-page',
+        data() {
+            return { msg: "" }
+        },
         computed: {
             langs() {
                 return Object.keys(lbls)
@@ -642,7 +673,11 @@
             },
             langchange(e) {
                 settings.lang = e.target.value;
+                this.msg = i('Language has been changed')
                 _savesettings()
+            },
+            i(x) {
+                return i(x)
             }
         }
     })
@@ -653,6 +688,11 @@
 
     function _savesettings() {
         localStorage.setItem('settings', JSON.stringify(settings))
+    }
+
+    function _delete(x) {
+        data.labours.splice(data.labours.findIndex(a => a.name == x.name), 1)
+        _save()
     }
 
     function _present(vdata) {
